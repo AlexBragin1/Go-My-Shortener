@@ -29,13 +29,13 @@ func Shorten() string {
 	return string(b)
 }
 
-func IsValueURL(LongUrl string) bool {
-	_, err := url.ParseRequestURI(LongUrl)
+func IsValueURL(LongURL string) bool {
+	_, err := url.ParseRequestURI(LongURL)
 	if err != nil {
 		fmt.Println("1", "false", err)
 		return false
 	}
-	u, err := url.Parse(LongUrl)
+	u, err := url.Parse(LongURL)
 	if err != nil || u.Host == "" {
 		fmt.Println("2", "false", err)
 		return false

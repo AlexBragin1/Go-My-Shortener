@@ -13,13 +13,13 @@ import (
 const AlphaBet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 const host = "http://localhost:8080/"
 
-type MyUrl struct {
-	LongUrl  string
-	ShortUrl string
+type MyURL struct {
+	LongURL  string
+	ShortURL string
 	Code     int
 }
 
-var Urls = map[string]MyUrl{}
+var Urls = map[string]MyURL{}
 
 func Shorten() string {
 	b := make([]byte, 7)
@@ -29,7 +29,7 @@ func Shorten() string {
 	return string(b)
 }
 
-func IsValueUrl(LongUrl string) bool {
+func IsValueURL(LongUrl string) bool {
 	_, err := url.ParseRequestURI(LongUrl)
 	if err != nil {
 		fmt.Println("1", "false", err)
@@ -43,40 +43,40 @@ func IsValueUrl(LongUrl string) bool {
 	return true
 }
 
-func SearchId(id string) (string, error) {
-	if Urls[id].ShortUrl != "" {
-		return Urls[id].LongUrl, nil
+func SearchID(id string) (string, error) {
+	if Urls[id].ShortURL != "" {
+		return Urls[id].LongURL, nil
 	}
 	return "", errors.New("NotFoundShortUrl")
 }
-func SearchLongUrl(LUrl string) (MyUrl, bool) {
-	var t MyUrl
+func SearchLongURL(LUrl string) (MyURL, bool) {
+	var t MyURL
 	for _, a := range Urls {
-		if a.LongUrl == LUrl {
+		if a.LongURL == LUrl {
 			return a, true
 		}
 	}
-	t.LongUrl = LUrl
+	t.LongURL = LUrl
 	return t, false
 }
 
-func AddUrls(id string, a MyUrl) {
+func AddURL(id string, a MyURL) {
 	Urls[id] = a
-	return
+
 }
 
 func GetOrPostHandler(w http.ResponseWriter, r *http.Request) {
 	var id string
 	var err error
 	var LUrl string
-	var NewUrl MyUrl
+	var NewURL MyURL
 	flag := false
 	switch r.Method {
 	case http.MethodGet:
 		{
 			ShortID := string(r.URL.Path)
-			if ShortID[1:len(ShortID)] != "" {
-				LUrl, err = SearchId(ShortID[1:len(ShortID)])
+			if ShortID[1:] != "" {
+				LUrl, err = SearchID(ShortID[1:])
 				if err != nil {
 					http.Error(w, "Missing1", http.StatusBadRequest)
 					return
@@ -94,32 +94,32 @@ func GetOrPostHandler(w http.ResponseWriter, r *http.Request) {
 
 			if err2 != nil {
 				http.Error(w, err2.Error(), 500)
-				NewUrl.Code = 400
+				NewURL.Code = 400
 			}
-			NewUrl.LongUrl = string(b)
-			if !IsValueUrl(NewUrl.LongUrl) {
+			NewURL.LongURL = string(b)
+			if !IsValueURL(NewURL.LongURL) {
 				http.Error(w, "Missing2", 400)
-				NewUrl.Code = 400
+				NewURL.Code = 400
 			} else {
-				NewUrl, flag = SearchLongUrl(NewUrl.LongUrl)
-				if !flag && NewUrl.Code == 0 {
+				NewURL, flag = SearchLongURL(NewURL.LongURL)
+				if !flag && NewURL.Code == 0 {
 					id = Shorten()
-					NewUrl.Code = http.StatusOK
-					NewUrl.ShortUrl = host + id
+					NewURL.Code = http.StatusOK
+					NewURL.ShortURL = host + id
 				}
 			}
-			w.WriteHeader(NewUrl.Code)
+			w.WriteHeader(NewURL.Code)
 			w.Header().Set("Content-Type", "application/text")
-			fmt.Fprintf(w, "%s", NewUrl.ShortUrl)
+			fmt.Fprintf(w, "%s", NewURL.ShortURL)
 
-			if flag == false {
-				AddUrls(id, NewUrl)
+			if !flag {
+				AddURL(id, NewURL)
 			}
 
 			return
 		}
 	}
-	return
+
 }
 
 func main() {

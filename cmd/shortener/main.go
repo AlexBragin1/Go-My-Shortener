@@ -88,7 +88,7 @@ func GetOrPostHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	case http.MethodPost:
 		{
-			w.WriteHeader(201)
+			//w.WriteHeader(201)
 			b, err2 := io.ReadAll(r.Body)
 			// обрабатываем ошибку
 
@@ -104,7 +104,7 @@ func GetOrPostHandler(w http.ResponseWriter, r *http.Request) {
 				NewURL, flag = SearchLongURL(NewURL.LongURL)
 				if !flag && NewURL.Code == 0 {
 					id = Shorten()
-					NewURL.Code = http.StatusOK
+					NewURL.Code = http.StatusCreated
 					NewURL.ShortURL = host + id
 				}
 			}

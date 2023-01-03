@@ -88,7 +88,7 @@ func GetOrPostHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	case http.MethodPost:
 		{
-
+			w.WriteHeader(201)
 			b, err2 := io.ReadAll(r.Body)
 			// обрабатываем ошибку
 
